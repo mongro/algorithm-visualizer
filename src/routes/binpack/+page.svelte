@@ -44,6 +44,13 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Bin Packing Calculator</title>
+	<meta
+		name="description"
+		content="Calculator that solves the bin packing problem and compares the results between next-fit and first-fit approach."
+	/>
+</svelte:head>
 <MainLayout title="Bin Packing Calculator">
 	<div slot="description">
 		This calculator is about the <a href="https://en.wikipedia.org/wiki/Bin_packing_problem"

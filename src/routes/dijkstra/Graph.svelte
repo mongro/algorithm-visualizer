@@ -76,7 +76,6 @@
 		const coords = transformCoords(event);
 		if (!coords) return;
 		const { x, y } = coords;
-		console.log('move', x, y);
 
 		if (draggedNode) {
 			dispatch('nodeMove', { node: draggedNode, x, y });

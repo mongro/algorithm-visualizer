@@ -11,6 +11,13 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Dijkstra algorithm</title>
+	<meta
+		name="description"
+		content="Create a graph and find the shortest paths between nodes with the dijkstra alogrithm."
+	/>
+</svelte:head>
 <MainLayout title="Shortest Path Calculator (Dijkstra)">
 	<div slot="description">
 		<p>

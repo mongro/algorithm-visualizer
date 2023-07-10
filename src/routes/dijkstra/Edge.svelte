@@ -21,7 +21,6 @@
 
 	function handleTransitionEnd(e: AnimationEvent) {
 		showAnimationPath = false;
-		console.log(e);
 	}
 
 	function constructCurve(start: Point, end: Point) {

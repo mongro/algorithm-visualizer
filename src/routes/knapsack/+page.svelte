@@ -40,6 +40,13 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Knapsack Calculator</title>
+	<meta
+		name="description"
+		content="Calculator that solves the knapsack problem and visualizes the results."
+	/>
+</svelte:head>
 <MainLayout title="Knapsack Calculator">
 	<div slot="description">
 		<p>

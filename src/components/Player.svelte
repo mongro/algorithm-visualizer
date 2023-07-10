@@ -3,11 +3,10 @@
 	import { onDestroy } from 'svelte';
 	import ProgressBar from '../components/ProgressBar.svelte';
 	import type UndoRedoStore from '../stores/Undo';
-	import type Graph from '../combinatorics/graph';
-	import type { EdgeData, NodeData } from '../routes/dijkstra/GraphData';
 	type T = $$Generic;
 	export let undoRedoStore: UndoRedoStore<T>;
-	let playSpeed = 1;
+	const DEFAULT_SPEED = 1000;
+	let speedMultiplicator = 1;
 	let isPlaying: boolean = false;
 	let autoPlayId: number;
 
@@ -20,7 +19,7 @@
 	function playStep() {
 		undoRedoStore.redo();
 		if (undoRedoStore.getRedoStackLength() > 0) {
-			autoPlayId = window.setTimeout(playStep, 500 / playSpeed);
+			autoPlayId = window.setTimeout(playStep, DEFAULT_SPEED / speedMultiplicator);
 		} else {
 			isPlaying = false;
 		}
@@ -33,7 +32,7 @@
 
 	function start() {
 		isPlaying = true;
-		autoPlayId = window.setTimeout(playStep, 500 / playSpeed);
+		autoPlayId = window.setTimeout(playStep, DEFAULT_SPEED / speedMultiplicator);
 	}
 
 	function pause() {
@@ -56,8 +55,8 @@
 <div class="header">
 	<div class="slider">
 		<label for="speed">Speed</label>
-		<input type="range" bind:value={playSpeed} min="1" max="5" name="speed" id="speed" />
-		<output class="slider-display" for="speed">{playSpeed}X</output>
+		<input type="range" bind:value={speedMultiplicator} min="1" max="5" name="speed" id="speed" />
+		<output class="slider-display" for="speed">{speedMultiplicator}X</output>
 	</div>
 	<Button size="large" color="primary" on:click={previous}>Previous Step</Button>
 	<ProgressBar
