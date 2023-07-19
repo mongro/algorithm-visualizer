@@ -4,6 +4,7 @@
 		changeNodeDataCommand,
 		batchCommand
 	} from '../../combinatorics/graphCommands';
+	import FaAngleRight from 'svelte-icons/fa/FaAngleRight.svelte';
 	import { dijkstra, type DijkstraStep } from '../../combinatorics/algorithms';
 	import GraphCanvas from './Graph.svelte';
 	import type Node from '../../combinatorics/node';
@@ -14,7 +15,6 @@
 	import Player from '../../components/Player.svelte';
 	import type Graph from '../../combinatorics/graph';
 	import Explanation from './Explanation.svelte';
-	import FaAngleRight from 'svelte-icons/fa/FaAngleRight.svelte';
 
 	const clonedGraph = new UndoRedoStore($graphStore.state.cloneGraph());
 	let distances: Map<string, number>;
@@ -163,10 +163,5 @@
 	.header {
 		background-color: #cbd5e1;
 		padding: 0.5rem;
-		margin: 0;
-		display: flex;
-		gap: 0.5rem;
-		height: 40px;
-		align-items: stretch;
 	}
 </style>

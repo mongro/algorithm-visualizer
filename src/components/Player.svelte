@@ -3,6 +3,11 @@
 	import { onDestroy } from 'svelte';
 	import ProgressBar from '../components/ProgressBar.svelte';
 	import type UndoRedoStore from '../stores/Undo';
+	import FaPause from 'svelte-icons/fa/FaPause.svelte';
+	import FaPlay from 'svelte-icons/fa/FaPlay.svelte';
+	import FaCaretRight from 'svelte-icons/fa/FaCaretRight.svelte';
+	import FaCaretLeft from 'svelte-icons/fa/FaCaretLeft.svelte';
+	import FaReply from 'svelte-icons/fa/FaReply.svelte';
 	type T = $$Generic;
 	export let undoRedoStore: UndoRedoStore<T>;
 	const DEFAULT_SPEED = 1000;
@@ -53,26 +58,51 @@
 </script>
 
 <div class="header">
+	<Button size="small" color="primary" on:click={previous}>
+		<div slot="startIcon">
+			<FaCaretLeft />
+		</div>
+		<div class="button-text">Previous Step</div>
+	</Button>
+	<ProgressBar
+		total={undoRedoStore.getTotalCommands()}
+		current={undoRedoStore.getHistoryLength()}
+	/>
+	<Button size="small" color="primary" on:click={next}>
+		<div slot="startIcon">
+			<FaCaretRight />
+		</div>
+		<div class="button-text">Next Step</div>
+	</Button>
+	{#if !isPlaying}
+		{#if undoRedoStore.getRedoStackLength() > 0}
+			<Button color="secondary" on:click={start}>
+				<div slot="startIcon">
+					<FaPlay />
+				</div>
+				<div class="button-text">Play</div></Button
+			>
+		{:else}
+			<Button color="secondary" on:click={replay}>
+				<div slot="startIcon">
+					<FaReply />
+				</div>
+				<div class="button-text">Replay</div></Button
+			>
+		{/if}
+	{:else}
+		<Button color="secondary" on:click={pause}>
+			<div slot="startIcon">
+				<FaPause />
+			</div>
+			<div class="button-text">Pause</div>
+		</Button>
+	{/if}
 	<div class="slider">
 		<label for="speed">Speed</label>
 		<input type="range" bind:value={speedMultiplicator} min="1" max="5" name="speed" id="speed" />
 		<output class="slider-display" for="speed">{speedMultiplicator}X</output>
 	</div>
-	<Button size="large" color="primary" on:click={previous}>Previous Step</Button>
-	<ProgressBar
-		total={undoRedoStore.getTotalCommands()}
-		current={undoRedoStore.getHistoryLength()}
-	/>
-	<Button size="large" color="primary" on:click={next}>Next Step</Button>
-	{#if !isPlaying}
-		{#if undoRedoStore.getRedoStackLength() > 0}
-			<Button size="large" color="primary" on:click={start}>Play</Button>
-		{:else}
-			<Button size="large" color="primary" on:click={replay}>Replay</Button>
-		{/if}
-	{:else}
-		<Button size="large" color="primary" on:click={pause}>Pause</Button>
-	{/if}
 </div>
 
 <style>
@@ -98,7 +128,14 @@
 		padding: 0.5rem;
 		margin: 0;
 		display: flex;
+		flex-wrap: wrap;
 		gap: 0.5rem;
 		align-items: center;
+	}
+
+	@media only screen and (max-width: 600px) {
+		.button-text {
+			display: none;
+		}
 	}
 </style>

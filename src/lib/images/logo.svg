@@ -1,0 +1,13 @@
+<svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<g id="A-B" ><path id="pathA-B" d="M40 160 L 80 40" stroke-width="2px" stroke="#0284c7" fill="none">
+</path>
+</g>
+<g id="A-C">
+<path  id="pathA-C" d="M80 40 L 120 160" stroke-width="2px" stroke="black"  fill="none">
+</path>
+<g  id="B-C" ><path  id="pathB-C" d="M120 160 L 160 40" stroke-width="2px" stroke="#dc2626"  fill="none"></path></g><g  id="B-C" ><path  id="pathB-C" d="M80 40 L 160 40" stroke-width="2px" stroke="#dc2626"  fill="none"></path>
+</g>
+</g>
+<g id="B-C" ><path  id="pathB-C" d="M40 160 L 120 160" stroke-width="2px" stroke="#0284c7"  fill="none"></path></g>
+
+<g id="A" transform="translate(40,160)"><circle r="20" stroke-width="2px" stroke="black" fill="#0284c7" ></circle></g><g id="B"  transform="translate(80,40)"><circle r="20" stroke-width="2px" stroke="black" fill="white" ></circle></g><g  id="C" transform="translate(120,160)"><circle r="20" stroke-width="2px" stroke="black" fill="white"></circle></g><g id="D" transform="translate(160,40)"><circle r="20" stroke-width="2px" stroke="black" fill="#dc2626"></circle></g></svg>

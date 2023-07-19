@@ -55,8 +55,8 @@
 				<input type="number" bind:value={item.weight} min="1" />
 			</div>
 			<div class="cell">
-				<Button size="large" color="primary" on:click={() => deleteItem(index)}>
-					{'Delete Item'}
+				<Button color="primary" on:click={() => deleteItem(index)}>
+					{'Remove'}
 				</Button>
 			</div>
 		{/each}
@@ -67,11 +67,11 @@
 			<input id="maxWeight" name="maxWeight" type="number" bind:value={maxWeight} />
 		</div>
 
-		<Button class="mr-2" size="large" color="primary" on:click={addItem}>
+		<Button class="mr-2" color="primary" on:click={addItem}>
 			{'Add Item'}
 		</Button>
-		<Button size="large" color="primary" on:click={handleClick}>
-			{'Run Algorithmus'}
+		<Button size="large" color="secondary" on:click={handleClick}>
+			{'Calculate'}
 		</Button>
 	</div>
 </div>
@@ -92,7 +92,10 @@
 
 	.form_footer {
 		display: flex;
+		flex-wrap: wrap;
 		margin-top: 1rem;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	label {

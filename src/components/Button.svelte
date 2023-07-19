@@ -33,6 +33,7 @@
 		user-select: none;
 		font-weight: 500;
 		white-space: nowrap;
+		gap: 0.25rem;
 	}
 
 	.btn-outlined.btn-primary:hover {
@@ -77,11 +78,6 @@
 	.icon {
 		border-radius: 50%;
 	}
-	.start-icon {
-		width: 1em;
-		height: 1em;
-		margin-right: 0.25rem;
-	}
 
 	.icon.size-large > .icon-wrapper {
 		height: 48px;
@@ -110,22 +106,21 @@
 
 	.size-large:not(.icon) {
 		font-size: 1rem;
-		padding: 0.5rem 1.15rem;
+		padding: 0.5rem 1rem;
 	}
 
 	.size-default:not(.icon) {
 		font-size: 0.875rem;
-		padding: 0.5rem 1rem;
+		padding: 0.4rem 0.8rem;
 	}
 
 	.size-small:not(.icon) {
 		font-size: 0.75rem;
-		padding: 0.5rem 0.85rem;
+		padding: 0.25rem 0.5rem;
 	}
 
 	:global([slot='startIcon']) {
 		width: 1em;
 		height: 1em;
-		margin-right: 0.25rem;
 	}
 </style>

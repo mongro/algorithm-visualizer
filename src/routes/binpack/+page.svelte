@@ -53,9 +53,24 @@
 </svelte:head>
 <MainLayout title="Bin Packing Calculator">
 	<div slot="description">
-		This calculator is about the <a href="https://en.wikipedia.org/wiki/Bin_packing_problem"
-			>Bin packing problem</a
-		>
+		<p>
+			The bin packing problem is a classic optimization problem in computer science and operations
+			research. It involves packing a set of items of different sizes into a minimum number of bins,
+			each with a fixed capacity. The goal is to find an efficient packing arrangement that
+			minimizes the number of bins used while ensuring that the total size of the items in each bin
+			does not exceed its capacity. It is considered a challenging problem with practical
+			applications in logistics, resource allocation, and scheduling.
+		</p>
+		<p>There are many heuristics that follow the same simple scheme:</p>
+		<ol>
+			<li>Take the next item from the collection.</li>
+			<li>If it is possible, put it into one of the currently open bins.</li>
+			<li>Open a new bin otherwise.</li>
+		</ol>
+		<p>
+			The <b>Next-Fit</b> algorithm keeps only one bin open and the <b>First-Fit</b> algorithm keeps
+			all bins open and considers them in the order in which they were opened.
+		</p>
 	</div>
 	<Elements {elements} on:removeElement={(e) => removeElement(e.detail)} {addElements} />
 	<Button on:click={handleClick}>Calculate</Button>

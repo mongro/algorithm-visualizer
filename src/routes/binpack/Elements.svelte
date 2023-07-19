@@ -43,6 +43,7 @@
 		align-items: end;
 		margin-bottom: 1rem;
 		flex-wrap: wrap;
+		gap: 0.25rem;
 	}
 
 	.element {
@@ -71,16 +72,20 @@
 	}
 
 	@media (min-width: 640px) {
+		.input-display {
+			gap: 0.5rem;
+		}
 		.element-container {
-			padding: 0.5rem;
-			width: 60px;
+			width: 40px;
 		}
 	}
 
 	@media (min-width: 900px) {
+		.input-display {
+			gap: 0.5rem;
+		}
 		.element-container {
-			padding: 1rem;
-			width: 60px;
+			width: 50px;
 		}
 	}
 </style>

@@ -11,11 +11,12 @@
 		changeEdgeDataCommand,
 		removeAllNodesCommand
 	} from '../../combinatorics/graphCommands';
-	import FaUndo from 'svelte-icons/fa/FaUndo.svelte';
+
 	import FaRedo from 'svelte-icons/fa/FaRedo.svelte';
 	import type { NodeData, EdgeData } from './GraphData';
 	import { graphStore } from './GraphData';
 	import FaArrowsAlt from 'svelte-icons/fa/FaArrowsAlt.svelte';
+	import FaUndo from 'svelte-icons/fa/FaUndo.svelte';
 
 	import type Node from '../../combinatorics/node';
 	import FaPlus from 'svelte-icons/fa/FaPlus.svelte';

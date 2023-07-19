@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type Graph from '../../combinatorics/graph';
+	import Button from '../../components/Button.svelte';
+
 	import type Node from '../../combinatorics/node';
 	import Circle from './Circle.svelte';
 	import Edge from './Edge.svelte';
@@ -11,18 +13,20 @@
 	export let panningEnabled: boolean = true;
 	const WIDTH = 700;
 	const HEIGHT = 700;
-	let isPanning = false;
-	let centerX = 0;
-	let centerY = 0;
-	let xOrigin: number | undefined;
-	let yOrigin: number | undefined;
 	const MAX_ZOOM = 5;
 	const MIN_ZOOM = 0.2;
+	const RADIUS = 20;
+	let isPanning = false;
+	let xOrigin: number | undefined;
+	let yOrigin: number | undefined;
+
 	let svg: SVGGraphicsElement;
 	let draggedNode: Node<NodeData, EdgeData> | undefined = undefined;
 	let zoomFactor = 1.2;
-	let vB = { x: centerX, y: centerY, width: WIDTH, height: HEIGHT };
+	let vB = { x: 0, y: 0, width: WIDTH, height: HEIGHT };
 	let viewBox: string;
+
+	adjustViewPort();
 
 	$: {
 		viewBox = '' + vB.x + ' ' + vB.y + ' ' + vB.width + ' ' + vB.height;
@@ -39,6 +43,42 @@
 
 	const dispatch = createEventDispatcher<ComponentEvents>();
 
+	function getBorderBox() {
+		let minX = Number.MAX_VALUE;
+		let minY = Number.MAX_VALUE;
+		let maxX = Number.MIN_VALUE;
+		let maxY = Number.MIN_VALUE;
+		for (let node of graph.getAllNodes()) {
+			minX = Math.min(node.data.point.x - 25, minX);
+			minY = Math.min(node.data.point.y - 25, minY);
+			maxX = Math.max(node.data.point.x + 25, maxX);
+			maxY = Math.max(node.data.point.y + 25, maxY);
+		}
+
+		return { minX, minY, maxX, maxY };
+	}
+
+	export function adjustViewPort() {
+		const borderBox = getBorderBox();
+		const neededZoomFactor = Math.max(
+			(borderBox.maxX - borderBox.minX) / vB.width,
+			(borderBox.maxY - borderBox.minY) / vB.height
+		);
+
+		if (neededZoomFactor > 1) {
+			vB.width *= neededZoomFactor;
+			vB.height *= neededZoomFactor;
+		}
+		if (
+			borderBox.minY < vB.y ||
+			borderBox.minX < vB.x ||
+			borderBox.maxX > vB.x + vB.width ||
+			borderBox.maxY > vB.y + vB.height
+		) {
+			vB.x = borderBox.minX * 0.5 + borderBox.maxX * 0.5 - 0.5 * vB.width;
+			vB.y = borderBox.minY - Math.min(vB.height - (borderBox.maxY - borderBox.minY) * 0.5, 50);
+		}
+	}
 	function handleEdgeClick(event: MouseEvent) {
 		const target = event.currentTarget as HTMLElement;
 		if (target) {
@@ -48,7 +88,13 @@
 		}
 	}
 
+	function handleTouchDown(event: TouchEvent) {
+		console.log('touch');
+	}
+
 	function handleMouseDown(event: MouseEvent) {
+		console.log('touch');
+
 		if (panningEnabled) {
 			const coords = transformCoords(event);
 			if (!coords) return;
@@ -60,20 +106,21 @@
 		if (event.target instanceof SVGElement) {
 			const node = event.target.closest('.node');
 			draggedNode = node ? graph.getNode(node.id) : undefined;
-			document.addEventListener('mousemove', handleMouseMove);
-			document.addEventListener('mouseup', handleMouseUp);
+			document.addEventListener('pointermove', handleMouseMove);
+			document.addEventListener('pointerup', handleMouseUp);
 		}
 	}
 
 	function handleMouseUp(event: MouseEvent) {
 		draggedNode = undefined;
 		isPanning = false;
-		document.removeEventListener('mousemove', handleMouseMove);
-		document.removeEventListener('mouseup', handleMouseUp);
+		document.removeEventListener('pointermove', handleMouseMove);
+		document.removeEventListener('pointerup', handleMouseUp);
 	}
 
 	function handleMouseMove(event: MouseEvent) {
 		const coords = transformCoords(event);
+		console.log('touchmmove', coords);
 		if (!coords) return;
 		const { x, y } = coords;
 
@@ -138,6 +185,9 @@
 
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="canvas-wrapper">
+		<div class="adjust-button">
+			<Button on:click={adjustViewPort}>Adjust Workspace</Button>
+		</div>
 		<div class="legend">
 			<div class="zoom-display">Zoom: {Math.ceil((vB.width / WIDTH) * 100)}%</div>
 			<slot name="legend" />
@@ -149,14 +199,14 @@
 			bind:this={svg}
 			{viewBox}
 			on:wheel={handleMouseWheel}
-			on:mousedown={handleMouseDown}
+			on:pointerdown={handleMouseDown}
 		>
 			<defs>
 				<!-- A marker to be used as an arrowhead -->
 				<marker
 					id="arrow-black"
 					viewBox="0 0 10 10"
-					refX="10"
+					refX={RADIUS + 6}
 					refY="6"
 					markerWidth="6"
 					markerHeight="6"
@@ -167,7 +217,7 @@
 				<marker
 					id="arrow-{COLOR_ORANGE}"
 					viewBox="0 0 10 10"
-					refX="10"
+					refX={RADIUS + 6}
 					refY="6"
 					markerWidth="6"
 					markerHeight="6"
@@ -178,7 +228,7 @@
 				<marker
 					id="arrow-{COLOR_BLUE}"
 					viewBox="0 0 10 10"
-					refX="10"
+					refX={RADIUS + 6}
 					refY="6"
 					markerWidth="6"
 					markerHeight="6"
@@ -189,7 +239,7 @@
 				<marker
 					id="arrow-{COLOR_BLUE}"
 					viewBox="0 0 10 10"
-					refX="10"
+					refX={RADIUS + 6}
 					refY="6"
 					markerWidth="6"
 					markerHeight="6"
@@ -200,7 +250,7 @@
 				<marker
 					id="arrow-{COLOR_GREY}"
 					viewBox="0 0 10 10"
-					refX="10"
+					refX={RADIUS + 6}
 					refY="6"
 					markerWidth="6"
 					markerHeight="6"
@@ -235,6 +285,7 @@
 					<Circle
 						on:click={() => handleNodeClick(node)}
 						id={node.id}
+						radius={RADIUS}
 						text={node.data.text || node.id}
 						point={node.data.point}
 						fill={node.data.fill || 'white'}
@@ -258,12 +309,26 @@
 		gap: 1rem;
 		align-items: end;
 	}
+
+	.adjust-button {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		padding: 1rem;
+	}
 	.container {
 		background-color: #475569;
 		text-align: center;
 		width: 100%;
 		height: 100%;
-		padding: 1rem;
+		padding: 0.25rem;
+	}
+
+	@media only screen and (min-width: 500px) {
+		.container {
+			padding: 1rem;
+		}
 	}
 
 	.canvas-wrapper {
@@ -277,5 +342,9 @@
 
 	.zoom-display {
 		padding: 1rem;
+	}
+
+	.canvas {
+		touch-action: none;
 	}
 </style>

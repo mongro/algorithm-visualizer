@@ -140,6 +140,9 @@
 		flex-wrap: nowrap;
 		align-items: end;
 		gap: 1rem;
+		overflow-x: scroll;
+		--min-cell-size: 25px;
+		--max-cell-size: 70px;
 	}
 	.cell.alarm {
 		background-color: #991b1b;
@@ -163,7 +166,7 @@
 		grid-gap: 0.5rem;
 		max-width: 300px;
 		grid-template-rows: repeat(var(--rows), auto);
-		grid-template-columns: repeat(2, minmax(50px, 70px));
+		grid-template-columns: repeat(2, minmax(var(--min-cell-size), var(--max-cell-size)));
 		background-color: black;
 		color: white;
 		padding: 0.5rem;
@@ -173,7 +176,10 @@
 		display: grid;
 		grid-gap: 0.5rem;
 		grid-template-rows: repeat(var(--rows), auto);
-		grid-template-columns: repeat(var(--columns), minmax(50px, 70px));
+		grid-template-columns: repeat(
+			var(--columns),
+			minmax(var(--min-cell-size), var(--max-cell-size))
+		);
 		grid-auto-flow: row dense;
 		background-color: black;
 		color: white;
