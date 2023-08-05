@@ -17,8 +17,8 @@
 	const MIN_ZOOM = 0.2;
 	const RADIUS = 20;
 	let isPanning = false;
-	let xOrigin: number | undefined;
-	let yOrigin: number | undefined;
+	let cachedTouches: PointerEvent[] = [];
+	let prevPinchDistance = -1;
 
 	let svg: SVGGraphicsElement;
 	let draggedNode: Node<NodeData, EdgeData> | undefined = undefined;
@@ -88,58 +88,73 @@
 		}
 	}
 
-	function handleTouchDown(event: TouchEvent) {
-		console.log('touch');
-	}
+	function handlePointerDown(event: PointerEvent) {
+		console.log('touch', event);
+		cachedTouches.push(event);
 
-	function handleMouseDown(event: MouseEvent) {
-		console.log('touch');
-
-		if (panningEnabled) {
-			const coords = transformCoords(event);
-			if (!coords) return;
-			const { x, y } = coords;
-			xOrigin = x;
-			yOrigin = y;
-			isPanning = true;
-		}
 		if (event.target instanceof SVGElement) {
 			const node = event.target.closest('.node');
 			draggedNode = node ? graph.getNode(node.id) : undefined;
-			document.addEventListener('pointermove', handleMouseMove);
-			document.addEventListener('pointerup', handleMouseUp);
+			document.addEventListener('pointermove', handlePointerMove);
+			document.addEventListener('pointerup', handlePointerUp);
 		}
 	}
 
-	function handleMouseUp(event: MouseEvent) {
+	function handlePointerUp(event: PointerEvent) {
+		event.preventDefault();
+		removeEventfromCache(event);
 		draggedNode = undefined;
 		isPanning = false;
-		document.removeEventListener('pointermove', handleMouseMove);
-		document.removeEventListener('pointerup', handleMouseUp);
+		if (cachedTouches.length < 1) {
+			prevPinchDistance = -1;
+		}
+		if (cachedTouches.length === 0) {
+			document.removeEventListener('pointermove', handlePointerMove);
+			document.removeEventListener('pointerup', handlePointerUp);
+		}
 	}
 
-	function handleMouseMove(event: MouseEvent) {
-		const coords = transformCoords(event);
-		console.log('touchmmove', coords);
-		if (!coords) return;
-		const { x, y } = coords;
+	function handlePointerMove(event: PointerEvent) {
+		console.log('handlePointerMove', cachedTouches);
 
-		if (draggedNode) {
-			dispatch('nodeMove', { node: draggedNode, x, y });
-		} else {
-			if (isPanning && xOrigin && yOrigin) {
-				const dx = x - xOrigin;
-				const dy = y - yOrigin;
+		if (cachedTouches.length === 1) {
+			const coords = transformCoords(event.clientX, event.clientY);
+			if (!coords) return;
+			const { x, y } = coords;
+			if (draggedNode) {
+				dispatch('nodeMove', { node: draggedNode, x, y });
+			} else {
+				if (panningEnabled) {
+					const prevPoint = transformCoords(cachedTouches[0].clientX, cachedTouches[0].clientY);
+					const dx = x - prevPoint.x;
+					const dy = y - prevPoint.y;
 
-				vB.x -= dx;
-				vB.y -= dy;
+					vB.x -= dx;
+					vB.y -= dy;
+					updatePointerCache(event);
+				}
 			}
+		} else if (cachedTouches.length === 2 && event.pointerType === 'touch') {
+			updatePointerCache(event);
+
+			const pointer1 = { x: cachedTouches[0].clientX, y: cachedTouches[0].clientY };
+			const pointer2 = { x: cachedTouches[1].clientX, y: cachedTouches[1].clientY };
+			const currentPinchDistance = getDistanceBetweenPoints(pointer1, pointer2);
+
+			if (prevPinchDistance > 0) {
+				const centerPoint = getCenterBetweenPoints(pointer1, pointer2);
+				const { x: centerX, y: centerY } = transformCoords(centerPoint.x, centerPoint.y);
+				let zoom = prevPinchDistance / currentPinchDistance;
+				zoomOnPoint(centerX, centerY, zoom);
+			}
+
+			prevPinchDistance = currentPinchDistance;
 		}
 	}
 
 	function handleCanvasClick(event: MouseEvent) {
 		if (event.target && event.target === event.currentTarget && !draggedNode) {
-			const coords = transformCoords(event);
+			const coords = transformCoords(event.clientX, event.clientY);
 			if (coords) {
 				const { x, y } = coords;
 				dispatch('canvasClick', { x, y });
@@ -147,36 +162,64 @@
 		}
 	}
 
-	function transformCoords(event: MouseEvent) {
-		let point = new DOMPoint(event.clientX, event.clientY);
+	function updatePointerCache(event: PointerEvent) {
+		const index = cachedTouches.findIndex((cachedEv) => cachedEv.pointerId === event.pointerId);
+		cachedTouches[index] = event;
+	}
+
+	function removeEventfromCache(event: PointerEvent) {
+		const index = cachedTouches.findIndex((cachedEv) => cachedEv.pointerId === event.pointerId);
+		cachedTouches.splice(index, 1);
+	}
+
+	function transformCoords(x: number, y: number) {
+		let point = new DOMPoint(x, y);
 		const ctm = svg.getScreenCTM();
-		return ctm !== null ? point.matrixTransform(ctm.inverse()) : undefined;
+		return ctm !== null ? point.matrixTransform(ctm.inverse()) : point;
+	}
+
+	function getDistanceBetweenPoints(
+		point1: { x: number; y: number },
+		point2: { x: number; y: number }
+	) {
+		const dx = point1.x - point2.x;
+		const dy = point1.y - point2.y;
+		return Math.sqrt(dx * dx + dy * dy);
+	}
+
+	function getCenterBetweenPoints(
+		point1: { x: number; y: number },
+		point2: { x: number; y: number }
+	) {
+		const x = Math.round((point1.x + point2.x) / 2);
+		const y = Math.round((point1.y + point2.y) / 2);
+		return { x, y };
 	}
 
 	function handleNodeClick(node: Node<NodeData, EdgeData>) {
 		dispatch('nodeClick', { node });
 	}
 
+	function zoomOnPoint(x: number, y: number, zoom: number) {
+		if ((zoom * vB.width) / WIDTH < MIN_ZOOM) {
+			zoom = (MIN_ZOOM * WIDTH) / vB.width;
+		} else if ((zoom * vB.width) / WIDTH > MAX_ZOOM) {
+			zoom = (MAX_ZOOM * WIDTH) / vB.width;
+		}
+		vB.x -= (x - vB.x) * (zoom - 1);
+		vB.y -= (y - vB.y) * (zoom - 1);
+		vB.width *= zoom;
+		vB.height *= zoom;
+	}
+
 	function handleMouseWheel(event: WheelEvent) {
 		event.preventDefault();
-		const coords = transformCoords(event);
-		if (coords) {
-			const { x, y } = coords;
-			let startPoint = { x, y };
-			const { deltaY } = event;
-			let zoom = deltaY > 0 ? zoomFactor : 1 / zoomFactor;
-			if ((zoom * vB.width) / WIDTH < MIN_ZOOM) {
-				zoom = (MIN_ZOOM * WIDTH) / vB.width;
-			} else if ((zoom * vB.width) / WIDTH > MAX_ZOOM) {
-				zoom = (MAX_ZOOM * WIDTH) / vB.width;
-			}
-			vB.x -= (startPoint.x - vB.x) * (zoom - 1);
-			vB.y -= (startPoint.y - vB.y) * (zoom - 1);
-			vB.width *= zoom;
-			vB.height *= zoom;
+		const coords = transformCoords(event.clientX, event.clientY);
 
-			dispatch('zoomChange', { scale: vB.width / WIDTH });
-		}
+		const { x, y } = coords;
+		const { deltaY } = event;
+		let zoom = deltaY > 0 ? zoomFactor : 1 / zoomFactor;
+		zoomOnPoint(x, y, zoom);
 	}
 </script>
 
@@ -189,7 +232,7 @@
 			<Button on:click={adjustViewPort}>Adjust Workspace</Button>
 		</div>
 		<div class="legend">
-			<div class="zoom-display">Zoom: {Math.ceil((vB.width / WIDTH) * 100)}%</div>
+			<div class="zoom-display">Zoom: {Math.ceil((WIDTH / vB.width) * 100)}%</div>
 			<slot name="legend" />
 		</div>
 		<svg
@@ -199,7 +242,7 @@
 			bind:this={svg}
 			{viewBox}
 			on:wheel={handleMouseWheel}
-			on:pointerdown={handleMouseDown}
+			on:pointerdown={handlePointerDown}
 		>
 			<defs>
 				<!-- A marker to be used as an arrowhead -->
