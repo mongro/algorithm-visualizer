@@ -1,26 +1,30 @@
 <script lang="ts">
-	export let icon = false;
-	export let size = 'default';
-	export let variant = 'contained';
-	export let color = 'secondary';
-	export let type: 'submit' | 'reset' | 'button' | undefined = undefined;
+	import type { HTMLButtonAttributes } from 'svelte/elements';
+
+	let {
+		children,
+		icon = false,
+		size = 'default',
+		color = 'secondary',
+		variant = 'contained',
+		ref = $bindable(null),
+		...restProps
+	}: HTMLButtonAttributes & {
+		icon?: boolean;
+		size?: 'large' | 'default' | 'small';
+		variant?: 'outlined' | 'contained';
+		color?: 'primary' | 'secondary';
+		ref?: HTMLButtonElement | null;
+	} = $props();
 </script>
 
 <button
-	{type}
-	on:click
-	{...$$restProps}
-	class="btn size-{size} btn-{variant} btn-{color} {$$restProps.class} "
+	{...restProps}
+	class="btn size-{size} btn-{variant} btn-{color} {restProps.class} "
 	class:icon
+	bind:this={ref}
 >
-	<slot name="startIcon" class="start-icon" />
-	{#if icon}
-		<div class="icon-wrapper">
-			<slot>Content</slot>
-		</div>
-	{:else}
-		<slot />
-	{/if}
+	{@render children?.()}
 </button>
 
 <style>
@@ -30,6 +34,7 @@
 		border: 0;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		user-select: none;
 		font-weight: 500;
 		white-space: nowrap;
@@ -79,44 +84,37 @@
 		border-radius: 50%;
 	}
 
-	.icon.size-large > .icon-wrapper {
-		height: 48px;
-		width: 48px;
-	}
-	.icon.size-default > .icon-wrapper {
-		height: 32px;
-		width: 32px;
-	}
-	.icon.size-small > .icon-wrapper {
-		height: 24px;
-		width: 24px;
-	}
-
-	.size-large {
-		padding: 1rem;
-	}
-
-	.size-default {
-		padding: 0.75rem;
-	}
-
-	.size-small {
-		padding: 0.5rem;
-	}
-
 	.size-large:not(.icon) {
-		font-size: 1rem;
-		padding: 0.5rem 1rem;
+		padding: 1rem;
+		font-size: 1.75rem;
 	}
 
 	.size-default:not(.icon) {
-		font-size: 0.875rem;
-		padding: 0.4rem 0.8rem;
+		padding: 0.75rem;
+		font-size: 1.25rem;
 	}
 
 	.size-small:not(.icon) {
+		padding: 0.5rem;
+		font-size: 1rem;
+	}
+
+	.size-large.icon {
+		width: 3rem;
+		height: 3rem;
+		font-size: 1.25rem;
+	}
+
+	.size-default.icon {
+		width: 2.25rem;
+		height: 2.25rem;
+		font-size: 1rem;
+	}
+
+	.size-small.icon {
+		width: 1.75rem;
+		height: 1.75rem;
 		font-size: 0.75rem;
-		padding: 0.25rem 0.5rem;
 	}
 
 	:global([slot='startIcon']) {

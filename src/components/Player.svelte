@@ -3,11 +3,12 @@
 	import { onDestroy } from 'svelte';
 	import ProgressBar from '../components/ProgressBar.svelte';
 	import type UndoRedoStore from '../stores/Undo';
-	import FaPause from 'svelte-icons/fa/FaPause.svelte';
-	import FaPlay from 'svelte-icons/fa/FaPlay.svelte';
-	import FaCaretRight from 'svelte-icons/fa/FaCaretRight.svelte';
-	import FaCaretLeft from 'svelte-icons/fa/FaCaretLeft.svelte';
-	import FaReply from 'svelte-icons/fa/FaReply.svelte';
+	import IconPause from '~icons/fa7-solid/pause';
+	import IconPlay from '~icons/fa7-solid/play';
+	import IconReply from '~icons/fa7-solid/reply';
+	import IconCaretRight from '~icons/fa7-solid/caret-right';
+	import IconCaretLeft from '~icons/fa7-solid/caret-left';
+
 	type T = $$Generic;
 	export let undoRedoStore: UndoRedoStore<T>;
 	const DEFAULT_SPEED = 1000;
@@ -58,43 +59,34 @@
 </script>
 
 <div class="header">
-	<Button size="small" color="primary" on:click={previous}>
-		<div slot="startIcon">
-			<FaCaretLeft />
-		</div>
+	<Button size="small" color="primary" onclick={previous}>
+		<IconCaretLeft />
 		<div class="button-text">Previous Step</div>
 	</Button>
 	<ProgressBar
 		total={undoRedoStore.getTotalCommands()}
 		current={undoRedoStore.getHistoryLength()}
 	/>
-	<Button size="small" color="primary" on:click={next}>
-		<div slot="startIcon">
-			<FaCaretRight />
-		</div>
+	<Button size="small" color="primary" onclick={next}>
+		<IconCaretRight />
 		<div class="button-text">Next Step</div>
 	</Button>
 	{#if !isPlaying}
 		{#if undoRedoStore.getRedoStackLength() > 0}
-			<Button color="secondary" on:click={start}>
-				<div slot="startIcon">
-					<FaPlay />
-				</div>
-				<div class="button-text">Play</div></Button
-			>
+			<Button color="secondary" onclick={start}>
+				<IconPlay />
+				<div class="button-text">Play</div>
+			</Button>
 		{:else}
-			<Button color="secondary" on:click={replay}>
-				<div slot="startIcon">
-					<FaReply />
-				</div>
+			<Button color="secondary" onclick={replay}>
+				<IconReply />
+
 				<div class="button-text">Replay</div></Button
 			>
 		{/if}
 	{:else}
-		<Button color="secondary" on:click={pause}>
-			<div slot="startIcon">
-				<FaPause />
-			</div>
+		<Button color="secondary" onclick={pause}>
+			<IconPause />
 			<div class="button-text">Pause</div>
 		</Button>
 	{/if}

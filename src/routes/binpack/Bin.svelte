@@ -14,7 +14,7 @@
 				in:fade={{ delay: 250 * index, duration: 300 }}
 				class="element element--under{Math.floor(size * 10) * 10}"
 				style="height:{size * 100}%"
-			/>
+			></div>
 		{/each}
 	</div>
 </div>

@@ -28,7 +28,7 @@
 		id="edgeWeight"
 	/>
 	<div class="form-footer">
-		<Button class="mr-1" on:click={modalStore.close}>Cancel</Button>
+		<Button class="mr-1" onclick={modalStore.close}>Cancel</Button>
 		<Button type="submit">Confirm</Button>
 	</div>
 </form>

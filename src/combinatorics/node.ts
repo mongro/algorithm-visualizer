@@ -1,4 +1,4 @@
-export interface weightedEdge {
+export interface WeightedEdge {
 	weight: number;
 }
 

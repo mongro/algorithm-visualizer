@@ -73,7 +73,7 @@
 		</p>
 	</div>
 	<Elements {elements} on:removeElement={(e) => removeElement(e.detail)} {addElements} />
-	<Button on:click={handleClick}>Calculate</Button>
+	<Button onclick={handleClick}>Calculate</Button>
 	{#key counter}
 		{#if calculated}
 			<h2>Next Fit</h2>

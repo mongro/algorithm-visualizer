@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import FaPlus from 'svelte-icons/fa/FaPlus.svelte';
-	import FaTrashAlt from 'svelte-icons/fa/FaTrashAlt.svelte';
+	import IconPlus from '~icons/fa7-solid/plus';
+	import IconTrashAlt from '~icons/fa7-solid/trash-alt';
 	import Button from '../../components/Button.svelte';
 	import { modalStore } from '../../components/modalStore';
 	import NewElement from './NewElement.svelte';
@@ -26,13 +26,13 @@
 				<div
 					class="element element--under{Math.floor(size * 10) * 10}"
 					style="height:{size * 100}%"
-				/>
+				></div>
 			</div>
-			<Button icon on:click={() => onRemove(index)} size="small"><FaTrashAlt /></Button>
+			<Button icon onclick={() => onRemove(index)} size="small"><IconTrashAlt /></Button>
 		</div>
 	{/each}
-	<Button on:click={() => modalStore.open(NewElement, { onSave: addElements })} icon>
-		<FaPlus />
+	<Button onclick={() => modalStore.open(NewElement, { onSave: addElements })} icon>
+		<IconPlus />
 	</Button>
 </div>
 

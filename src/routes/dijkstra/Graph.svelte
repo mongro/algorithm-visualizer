@@ -6,6 +6,8 @@
 	import Circle from './Circle.svelte';
 	import Edge from './Edge.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import IconSearchPlus from '~icons/fa7-solid/search-plus';
+	import IconSearchMinus from '~icons/fa7-solid/search-minus';
 	import type { EdgeData, NodeData } from './GraphData';
 	import { COLOR_GREY, COLOR_ORANGE, COLOR_BLUE } from './GraphData';
 
@@ -211,9 +213,17 @@
 		vB.width *= zoom;
 		vB.height *= zoom;
 	}
+	function zoomOnCenter(zoom: number) {
+		const cx = vB.x + vB.width / 2;
+		const cy = vB.y + vB.height / 2;
+		zoomOnPoint(cx, cy, zoom);
+	}
 
 	function handleMouseWheel(event: WheelEvent) {
+		console.log('onwheel');
+
 		event.preventDefault();
+		console.log('onwheel');
 		const coords = transformCoords(event.clientX, event.clientY);
 
 		const { x, y } = coords;
@@ -223,26 +233,28 @@
 	}
 </script>
 
-<div class="container">
+<div class="container" onwheel={handleMouseWheel}>
 	<slot name="header" />
 
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="canvas-wrapper">
-		<div class="adjust-button">
-			<Button on:click={adjustViewPort}>Adjust Workspace</Button>
+		<div class="header">
+			<Button onclick={adjustViewPort}>Adjust Workspace</Button>
+			<Button icon onclick={() => zoomOnCenter(1 / zoomFactor)}><IconSearchPlus /></Button>
+			<Button icon onclick={() => zoomOnCenter(zoomFactor)}><IconSearchMinus /></Button>
+			<div class="zoom-display">Zoom: {Math.ceil((WIDTH / vB.width) * 100)}%</div>
 		</div>
 		<div class="legend">
-			<div class="zoom-display">Zoom: {Math.ceil((WIDTH / vB.width) * 100)}%</div>
 			<slot name="legend" />
 		</div>
 		<svg
 			class="canvas"
 			style="cursor: {isPanning ? 'move' : 'auto'}"
-			on:click={handleCanvasClick}
+			onclick={handleCanvasClick}
 			bind:this={svg}
 			{viewBox}
-			on:wheel={handleMouseWheel}
-			on:pointerdown={handlePointerDown}
+			onwheel={handleMouseWheel}
+			onpointerdown={handlePointerDown}
 		>
 			<defs>
 				<!-- A marker to be used as an arrowhead -->
@@ -353,12 +365,14 @@
 		align-items: end;
 	}
 
-	.adjust-button {
+	.header {
 		position: absolute;
-		top: 0;
-		left: 0;
+		height: 60px;
+		display: flex;
+		align-items: center;
 		z-index: 1;
 		padding: 1rem;
+		gap: 0.5rem;
 	}
 	.container {
 		background-color: #475569;

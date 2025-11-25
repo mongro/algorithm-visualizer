@@ -1,9 +1,9 @@
-import type { SvelteComponent } from 'svelte';
+import type { Component } from 'svelte';
 import { writable } from 'svelte/store';
 
 interface ModalComponent {
-	component: typeof SvelteComponent;
-	props: {};
+	component: Component<any>;
+	props: object;
 }
 
 type Modal = ModalComponent | null;
@@ -14,8 +14,8 @@ function createModalStore(initial: Modal) {
 
 	return {
 		subscribe,
-		open: (component: typeof SvelteComponent, props: {}) => {
-			set({ component, props });
+		open: (component: ModalComponent['component'], propsC: Record<string, any>) => {
+			set({ component, props: propsC });
 		},
 		close: () => {
 			set(null);

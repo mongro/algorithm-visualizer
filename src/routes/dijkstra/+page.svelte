@@ -3,9 +3,10 @@
 	import Button from '../../components/Button.svelte';
 	import Runner from './Runner.svelte';
 	import MainLayout from '../../components/MainLayout.svelte';
+	import type { PageProps } from './$types';
 
-	let editing = true;
-
+	let editing = $state(true);
+	let { data }: PageProps = $props();
 	function handleClick(event: MouseEvent) {
 		editing = !editing;
 	}
@@ -35,7 +36,7 @@
 		</p>
 	</div>
 	<div>
-		<Button size="large" color="primary" on:click={handleClick}>
+		<Button size="large" color="primary" onclick={handleClick}>
 			{editing ? 'Run Algorithmus' : 'Edit Graph'}
 		</Button>
 	</div>

@@ -21,7 +21,7 @@
 
 {#if $modalStore}
 	<div class="modal" use:focusTrap use:preventScrolling>
-		<div class="backdrop" on:click={modalStore.close} />
+		<div class="backdrop" onclick={modalStore.close} />
 		<div class="content-wrapper">
 			<div class="content">
 				<svelte:component this={$modalStore.component} {...$modalStore.props} />

@@ -4,40 +4,32 @@
 	import focusOnMount from '../../actions/focusOnMount';
 	import type { BinElement } from './types';
 
-	export let onSave: (element: BinElement) => void;
-
-	let quantity = 1;
-	let previousQuantity = 1;
-	let size = 50;
-
-	function validator(node: HTMLInputElement, quantity: number) {
-		return {
-			update(value) {
-				//console.log(value);
-				quantity = value === null || quantity < node.min ? previousQuantity : parseInt(quantity);
-				previousQuantity = quantity;
-			}
-		};
+	interface PropsNewElement {
+		onSave: (element: BinElement) => void;
 	}
 
-	function onSubmit() {
-		onSave({ quantity, size });
-		modalStore.close();
+	const { onSave }: PropsNewElement = $props();
+
+	let quantity = $state(1);
+	let size = $state(50);
+
+	function validateInput() {
+		return quantity > 0 && size < 101 && size > 0;
+	}
+
+	function onSubmit(event: SubmitEvent) {
+		event.preventDefault();
+		if (validateInput()) {
+			onSave({ quantity, size });
+			modalStore.close();
+		}
 	}
 </script>
 
 <h1>Add new elements</h1>
-<form on:submit|preventDefault={onSubmit}>
+<form onsubmit={onSubmit}>
 	<label for="number">Number of elements to add</label>
-	<input
-		use:validator={quantity}
-		use:focusOnMount
-		bind:value={quantity}
-		type="number"
-		min="1"
-		name="number"
-		id="number"
-	/>
+	<input use:focusOnMount bind:value={quantity} type="number" min="1" name="number" id="number" />
 
 	<label for="size">Size of added elements</label>
 
@@ -46,7 +38,7 @@
 		<output class="slider-display" for="size">{size}%</output>
 	</div>
 	<div class="form-footer">
-		<Button class="mr-1" on:click={modalStore.close}>Cancel</Button>
+		<Button class="mr-1" onclick={modalStore.close}>Cancel</Button>
 		<Button type="submit">Confirm</Button>
 	</div>
 </form>

@@ -42,7 +42,7 @@
 		<div class="head cell">Items</div>
 		<div class="head cell">Values</div>
 		<div class="head cell">Weights</div>
-		<div class="head cell" />
+		<div class="head cell"></div>
 
 		{#each items as item, index (item.id)}
 			<div class="cell">
@@ -55,7 +55,7 @@
 				<input type="number" bind:value={item.weight} min="1" />
 			</div>
 			<div class="cell">
-				<Button color="primary" on:click={() => deleteItem(index)}>
+				<Button color="primary" onclick={() => deleteItem(index)}>
 					{'Remove'}
 				</Button>
 			</div>
@@ -67,10 +67,10 @@
 			<input id="maxWeight" name="maxWeight" type="number" bind:value={maxWeight} />
 		</div>
 
-		<Button class="mr-2" color="primary" on:click={addItem}>
+		<Button class="mr-2" color="primary" onclick={addItem}>
 			{'Add Item'}
 		</Button>
-		<Button size="large" color="secondary" on:click={handleClick}>
+		<Button size="large" color="secondary" onclick={handleClick}>
 			{'Calculate'}
 		</Button>
 	</div>

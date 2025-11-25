@@ -1,6 +1,6 @@
 import Node from './node';
 
-export default class Graph<NodeData = {}, EdgeData = {}> {
+export default class Graph<NodeData = object, EdgeData = object> {
 	id: string;
 	nodes: Map<string, Node<NodeData, EdgeData>>;
 
@@ -17,7 +17,7 @@ export default class Graph<NodeData = {}, EdgeData = {}> {
 	}
 
 	getAllEdgesTo(id: string) {
-		let edges = [];
+		const edges = [];
 		for (const node of this.nodes.values()) {
 			const successor = node.hasSuccessor(id);
 			if (successor !== undefined) {
@@ -29,7 +29,7 @@ export default class Graph<NodeData = {}, EdgeData = {}> {
 	}
 
 	getAllPredecessors(id: string) {
-		let predecessors = [];
+		const predecessors = [];
 		for (const node of this.nodes.values()) {
 			if (node.hasSuccessor(id)) {
 				predecessors.push(node);
@@ -92,6 +92,41 @@ export default class Graph<NodeData = {}, EdgeData = {}> {
 		this.nodes = new Map();
 	}
 
+	toJSON() {
+		return {
+			id: this.id,
+			nodes: [...this.nodes.values()].map((node) => ({
+				id: node.id,
+				data: node.data,
+				successors: [...node.adjacentNodes.entries()].map(([target, edgeData]) => ({
+					target,
+					data: edgeData
+				}))
+			}))
+		};
+	}
+
+	static fromJSON<NodeData = object, EdgeData = object>(json: GraphJsonData<NodeData, EdgeData>) {
+		//validation
+		const graph = new Graph<NodeData, EdgeData>(json.id);
+
+		// 1. Create all nodes first
+		for (const nodeJson of json.nodes) {
+			graph.nodes.set(nodeJson.id, new Node(nodeJson.id, nodeJson.data));
+		}
+
+		// 2. Add all edges
+		for (const nodeJson of json.nodes) {
+			const node = graph.nodes.get(nodeJson.id)!;
+
+			for (const edge of nodeJson.successors) {
+				node.addEdge(edge.target, edge.data);
+			}
+		}
+
+		return graph;
+	}
+
 	cloneGraph() {
 		const clonedGraph = new Graph<NodeData, EdgeData>('1');
 
@@ -118,3 +153,14 @@ export default class Graph<NodeData = {}, EdgeData = {}> {
 		return clonedGraph;
 	}
 }
+
+export interface GraphJsonData<NodeData, EdgeData> {
+	id: string;
+	nodes: NodeJson<NodeData, EdgeData>[];
+}
+
+type NodeJson<NodeData, EdgeData> = {
+	id: string;
+	data: NodeData;
+	successors: { data: EdgeData; target: string }[];
+};

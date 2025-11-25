@@ -11,21 +11,32 @@
 		changeEdgeDataCommand,
 		removeAllNodesCommand
 	} from '../../combinatorics/graphCommands';
-
-	import FaRedo from 'svelte-icons/fa/FaRedo.svelte';
-	import type { NodeData, EdgeData } from './GraphData';
-	import { graphStore } from './GraphData';
-	import FaArrowsAlt from 'svelte-icons/fa/FaArrowsAlt.svelte';
-	import FaUndo from 'svelte-icons/fa/FaUndo.svelte';
-
+	import {
+		type NodeData,
+		type EdgeData,
+		initializeGraphStoreFromUrl,
+		initializeGraphStoreWithExample,
+		graphStore
+	} from './GraphData';
 	import type Node from '../../combinatorics/node';
-	import FaPlus from 'svelte-icons/fa/FaPlus.svelte';
-	import FaConnectdevelop from 'svelte-icons/fa/FaConnectdevelop.svelte';
-	import FaTimesCircle from 'svelte-icons/fa/FaTimesCircle.svelte';
-	import FaRegTrashAlt from 'svelte-icons/fa/FaRegTrashAlt.svelte';
+	import { page } from '$app/state';
+	import { replaceState } from '$app/navigation';
+	import IconRedo from '~icons/fa7-solid/redo';
+	import IconUndo from '~icons/fa7-solid/undo';
+	import IconPlus from '~icons/fa7-solid/plus';
+	import IconTrashAlt from '~icons/fa7-solid/trash-alt';
+	import IconTimesCircle from '~icons/fa7-solid/times-circle';
+	import IconEdge from '~icons/fa7-solid/arrows-alt-h';
+	import IconCross from '~icons/fa7-solid/arrows-alt';
+	import LZString from 'lz-string';
+	import { createNotification } from '../../components/notificationState.svelte';
+	import { fade } from 'svelte/transition';
 
 	let selectedNode: Node | null = null;
-	let tool = 'addNode';
+	let tool = $state('addNode');
+
+	const graphParam = page.url.searchParams.get('graph');
+	graphParam ? initializeGraphStoreFromUrl(graphParam) : initializeGraphStoreWithExample();
 
 	const removeEdge = (source: string, destination: string) => {
 		graphStore.execute(new removeEdgeCommand(source, destination));
@@ -54,6 +65,8 @@
 			return graph;
 		});
 	};
+
+	let notification = createNotification();
 
 	function selectTool(s: string) {
 		tool = s;
@@ -116,6 +129,17 @@
 		}
 	}
 
+	function graphToUrl() {
+		const json = $graphStore.state.toJSON();
+		const text = JSON.stringify(json);
+
+		const url = LZString.compressToEncodedURIComponent(text);
+		const searchParams = page.url.searchParams;
+		searchParams.set('graph', url);
+		replaceState(page.url, {});
+		notification.triggerShow();
+	}
+
 	function handleClick(event: CustomEvent<{ x: number; y: number }>) {
 		//noElement clicked
 		if (tool === 'addNode') {
@@ -143,77 +167,79 @@
 			<li>
 				<Button
 					variant={tool === 'default' ? 'outlined' : 'contained'}
-					on:click={() => {
+					onclick={() => {
 						selectTool('default');
 					}}
 				>
-					<div slot="startIcon">
-						<FaArrowsAlt />
-					</div>
+					<IconCross />
 					<span class="button-text">Move Node/Workspace</span>
 				</Button>
 			</li>
 			<li>
 				<Button
 					variant={tool === 'addNode' ? 'outlined' : 'contained'}
-					on:click={() => {
+					onclick={() => {
 						selectTool('addNode');
 					}}
 				>
-					<div slot="startIcon">
-						<FaPlus />
-					</div>
+					<IconPlus />
 					<span class="button-text">Add Node</span>
 				</Button>
 			</li>
 			<li>
 				<Button
 					variant={tool === 'delete' ? 'outlined' : 'contained'}
-					on:click={() => {
+					onclick={() => {
 						selectTool('delete');
 					}}
-					><div slot="startIcon">
-						<FaTimesCircle />
-					</div>
+				>
+					<IconTimesCircle />
 					<span class="button-text">Delete element</span>
 				</Button>
 			</li>
 			<li>
 				<Button
 					variant={tool === 'addEdge' ? 'outlined' : 'contained'}
-					on:click={() => {
+					onclick={() => {
 						selectTool('addEdge');
 					}}
 				>
-					<div slot="startIcon">
-						<FaConnectdevelop />
-					</div>
+					<IconEdge />
 					<span class="button-text">Add Edge</span></Button
 				>
 			</li>
 			<li>
-				<Button variant="contained" on:click={() => removeAllNodes()}
-					><div slot="startIcon">
-						<FaRegTrashAlt />
-					</div>
+				<Button variant="contained" onclick={() => removeAllNodes()}>
+					<IconTrashAlt />
 					<span class="button-text">Remove All</span></Button
 				>
 			</li>
 			<li>
-				<Button icon size="small" variant="contained" on:click={() => graphStore.undo()}>
-					<FaUndo />
+				<Button icon variant="contained" onclick={() => graphStore.undo()}>
+					<IconUndo />
 				</Button>
 			</li>
 			<li>
-				<Button icon size="small" variant="contained" on:click={() => graphStore.redo()}>
-					<FaRedo />
+				<Button icon variant="contained" onclick={() => graphStore.redo()}>
+					<IconRedo />
 				</Button>
+			</li>
+			<li>
+				<div class="relative">
+					<Button variant="contained" color="primary" onclick={graphToUrl}>Save</Button>
+					{#if notification.show}
+						<div class="notification" transition:fade>Graph stored in updated URL.</div>
+					{/if}
+				</div>
 			</li>
 		</ul>
 	</div>
 </GraphCanvas>
 
 <style>
+	.relative {
+		position: relative;
+	}
 	.tabs {
 		list-style: none;
 		display: flex;
@@ -228,5 +254,21 @@
 		.button-text {
 			display: none;
 		}
+	}
+
+	.notification {
+		position: absolute;
+		left: 110%;
+		top: 0;
+		width: 22rem;
+		background-color: white;
+		box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+		padding-block: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+
+		z-index: 100;
+		border: 1px solid hsl(0, 0%, 20%);
+		border-radius: 5px;
 	}
 </style>

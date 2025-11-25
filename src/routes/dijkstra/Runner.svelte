@@ -4,7 +4,7 @@
 		changeNodeDataCommand,
 		batchCommand
 	} from '../../combinatorics/graphCommands';
-	import FaAngleRight from 'svelte-icons/fa/FaAngleRight.svelte';
+	import IconAngleRight from '~icons/fa7-solid/angle-right';
 	import { dijkstra, type DijkstraStep } from '../../combinatorics/algorithms';
 	import GraphCanvas from './Graph.svelte';
 	import type Node from '../../combinatorics/node';
@@ -15,6 +15,7 @@
 	import Player from '../../components/Player.svelte';
 	import type Graph from '../../combinatorics/graph';
 	import Explanation from './Explanation.svelte';
+	import Button from '../../components/Button.svelte';
 
 	const clonedGraph = new UndoRedoStore($graphStore.state.cloneGraph());
 	let distances: Map<string, number>;
@@ -116,12 +117,12 @@
 	</div>
 	<div slot="legend">
 		{#if distances}
-			<button class="button-hide" on:click={handleClick}>
-				<span class="arrow" class:right={!legendIsOpen}>
-					<FaAngleRight />
+			<Button icon class="button-hide" onclick={handleClick}>
+				<span class={['arrow', !legendIsOpen && 'right']}>
+					<IconAngleRight />
 				</span>
-			</button>
-			<div class="explanation" class:show={legendIsOpen}>
+			</Button>
+			<div class="explanation right" class:show={legendIsOpen}>
 				<Explanation />
 			</div>
 		{/if}
@@ -130,8 +131,6 @@
 
 <style>
 	.arrow {
-		width: 32px;
-		height: 32px;
 		transition: transform 0.5s ease;
 	}
 
@@ -150,14 +149,6 @@
 		position: absolute;
 		right: 0;
 		transition: transform 0.5s ease;
-	}
-	.button-hide {
-		outline: 0;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px;
 	}
 
 	.header {

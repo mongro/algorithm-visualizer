@@ -2,7 +2,6 @@ import type { Bin, BinElement } from '../routes/binpack/types';
 import type Graph from './graph';
 import type Node from './node';
 import type { weightedEdge } from './node';
-import type { Command } from '../stores/Undo';
 import type { KnapSackData } from '../routes/knapsack/ArrayData';
 import { batchCommand } from './graphCommands';
 import { changeCurrentItem, changeCurrentWeight, changeEntry2D } from './arrayCommands';
@@ -13,7 +12,7 @@ export function nextFit(elementsUnflattend: BinElement[]) {
 		[]
 	);
 
-	let bins: Bin[] = [{ fillRate: 0, elements: [] }];
+	const bins: Bin[] = [{ fillRate: 0, elements: [] }];
 
 	for (let i = 0, n = elements.length; i < n; i++) {
 		const size = elements[i];
@@ -35,7 +34,7 @@ export function firstFit(elementsUnflattend: BinElement[]) {
 		[]
 	);
 
-	let bins = <Bin[]>[];
+	const bins = <Bin[]>[];
 	for (let i = 0, n = elements.length; i < n; i++) {
 		const size = elements[i];
 		const binsLength = bins.length;
@@ -58,12 +57,12 @@ export function firstFit(elementsUnflattend: BinElement[]) {
 }
 
 export function firstFitDecrease(elements: BinElement[]) {
-	let sortedElements = [...elements].sort((a, b) => b.size - a.size);
+	const sortedElements = [...elements].sort((a, b) => b.size - a.size);
 	return firstFit(sortedElements);
 }
 
 export function nextFitDecrease(elements: BinElement[]) {
-	let sortedElements = [...elements].sort((a, b) => b.size - a.size);
+	const sortedElements = [...elements].sort((a, b) => b.size - a.size);
 	return nextFit(sortedElements);
 }
 
