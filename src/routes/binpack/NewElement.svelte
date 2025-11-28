@@ -1,14 +1,15 @@
 <script lang="ts">
 	import Button from '../../components/Button.svelte';
-	import { modalStore } from '../../components/modalStore';
+	import { modalStore } from '../../components/modalStore.svelte';
 	import focusOnMount from '../../actions/focusOnMount';
 	import type { BinElement } from './types';
 
 	interface PropsNewElement {
 		onSave: (element: BinElement) => void;
+		id?: string;
 	}
 
-	const { onSave }: PropsNewElement = $props();
+	const { onSave, id }: PropsNewElement = $props();
 
 	let quantity = $state(1);
 	let size = $state(50);
@@ -26,7 +27,7 @@
 	}
 </script>
 
-<h1>Add new elements</h1>
+<h1 {id}>Add new elements</h1>
 <form onsubmit={onSubmit}>
 	<label for="number">Number of elements to add</label>
 	<input use:focusOnMount bind:value={quantity} type="number" min="1" name="number" id="number" />
@@ -44,6 +45,9 @@
 </form>
 
 <style>
+	h1 {
+		margin-bottom: 1rem;
+	}
 	.form-footer {
 		display: flex;
 		justify-content: right;

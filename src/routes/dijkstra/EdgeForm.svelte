@@ -1,22 +1,29 @@
 <script lang="ts">
-	import { modalStore } from '../../components/modalStore';
+	import { modalStore } from '../../components/modalStore.svelte';
 	import Button from '../../components/Button.svelte';
 	import focusOnMount from '../../actions/focusOnMount';
 
-	export let weight = 1;
-	export let onSave: (weight: number) => void;
-	export let edit: boolean = false;
-	export let source: string;
-	export let destination: string;
+	type EdgeFormProps = {
+		weight?: number;
+		edit?: boolean;
+		destination: string;
+		source: string;
+		titleId?: string;
+		onSave: (weight: number) => void;
+	};
+	let { weight = 1, onSave, edit = false, source, destination, titleId }: EdgeFormProps = $props();
 
-	function onSubmit() {
+	console.log('title', titleId);
+
+	function onSubmit(event: SubmitEvent) {
+		event.preventDefault();
 		onSave(weight);
 		modalStore.close();
 	}
 </script>
 
-<h1>{edit ? 'Edit edge' : 'Add edge'}</h1>
-<form on:submit|preventDefault={onSubmit}>
+<h1 id={titleId}>{edit ? 'Edit edge' : 'Add edge'}</h1>
+<form onsubmit={onSubmit}>
 	<label for="edgeWeight">Weight of edge {source} to {destination}</label>
 	<input
 		use:focusOnMount
@@ -28,7 +35,7 @@
 		id="edgeWeight"
 	/>
 	<div class="form-footer">
-		<Button class="mr-1" onclick={modalStore.close}>Cancel</Button>
+		<Button type="button" class="mr-1" onclick={modalStore.close}>Cancel</Button>
 		<Button type="submit">Confirm</Button>
 	</div>
 </form>
@@ -44,5 +51,9 @@
 	label {
 		margin-bottom: 0.5rem;
 		display: block;
+	}
+
+	h1 {
+		margin-bottom: 1rem;
 	}
 </style>

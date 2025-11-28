@@ -3,7 +3,7 @@
 	import IconPlus from '~icons/fa7-solid/plus';
 	import IconTrashAlt from '~icons/fa7-solid/trash-alt';
 	import Button from '../../components/Button.svelte';
-	import { modalStore } from '../../components/modalStore';
+	import { modalStore } from '../../components/modalStore.svelte';
 	import NewElement from './NewElement.svelte';
 	import type { BinElement } from './types';
 

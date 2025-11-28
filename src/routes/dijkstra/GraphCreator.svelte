@@ -2,7 +2,7 @@
 	import GraphCanvas from './Graph.svelte';
 	import Button from '../../components/Button.svelte';
 	import EdgeForm from './EdgeForm.svelte';
-	import { modalStore } from '../../components/modalStore';
+	import { modalStore } from '../../components/modalStore.svelte';
 	import {
 		removeEdgeCommand,
 		removeNodeCommand,
@@ -32,8 +32,10 @@
 	import { createNotification } from '../../components/notificationState.svelte';
 	import { fade } from 'svelte/transition';
 
-	let selectedNode: Node | null = null;
+	let selectedNode: Node | null = $state(null);
 	let tool = $state('addNode');
+
+	$inspect(selectedNode);
 
 	const graphParam = page.url.searchParams.get('graph');
 	graphParam ? initializeGraphStoreFromUrl(graphParam) : initializeGraphStoreWithExample();
@@ -84,13 +86,13 @@
 			case 'addEdge':
 				if (selectedNode === null) {
 					selectedNode = node;
-					changeNodeData(node.id, { stroke: 'red' });
+					//changeNodeData(node.id, { stroke: 'red' });
 				} else if (selectedNode !== node) {
 					modalStore.open(EdgeForm, {
 						onSave: (weight: number) => {
 							if (selectedNode === null) return;
 							addEdge(selectedNode.id, node.id, { weight });
-							changeNodeData(selectedNode.id, { stroke: 'black' });
+							//changeNodeData(selectedNode.id, { stroke: 'black' });
 							selectedNode = null;
 						},
 						source: selectedNode.id,
@@ -111,6 +113,7 @@
 
 	function handleEdgeClick(event: CustomEvent<{ source: string; destination: string }>) {
 		const { source, destination } = event.detail;
+
 		if (tool === 'delete') {
 			removeEdge(source, destination);
 		} else if (tool === 'addEdge') {
@@ -151,12 +154,18 @@
 			const id = String.fromCharCode(65 + index);
 			addNode(id, { point: { x, y } });
 		}
+
+		if (tool === 'addEdge') {
+			selectedNode = null;
+			console.log('empty Click');
+		}
 	}
 </script>
 
 <GraphCanvas
 	graph={$graphStore.state}
 	panningEnabled={tool === 'default'}
+	selectedNode={selectedNode?.id}
 	on:nodeClick={handleNodeClick}
 	on:edgeClick={handleEdgeClick}
 	on:canvasClick={handleClick}

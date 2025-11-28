@@ -13,6 +13,7 @@
 
 	export let graph: Graph<NodeData, EdgeData>;
 	export let panningEnabled: boolean = true;
+	export let selectedNode = '';
 	const WIDTH = 700;
 	const HEIGHT = 700;
 	const MAX_ZOOM = 5;
@@ -344,7 +345,7 @@
 						text={node.data.text || node.id}
 						point={node.data.point}
 						fill={node.data.fill || 'white'}
-						stroke={node.data.stroke || 'black'}
+						stroke={selectedNode === node.id ? 'red' : node.data.stroke || 'black'}
 					/>
 				{/each}
 			</g>
