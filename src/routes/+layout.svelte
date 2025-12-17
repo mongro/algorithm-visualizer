@@ -20,10 +20,9 @@
 	}
 
 	main {
-		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 0.5rem;
+		padding: 1rem;
 		width: 100%;
 		max-width: 64rem;
 		margin: 0 auto;
@@ -32,7 +31,7 @@
 
 	@media only screen and (min-width: 500px) {
 		main {
-			padding: 1rem;
+			padding: 2rem;
 		}
 	}
 </style>

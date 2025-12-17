@@ -16,15 +16,15 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		flex: 0.6;
+		gap: 0.5rem;
 	}
 
 	h1 {
-		width: 100%;
+		text-align: center;
+		margin: 1rem 0;
 	}
 
 	a {
-		padding: 1rem;
 		font-size: 20px;
 	}
 </style>
